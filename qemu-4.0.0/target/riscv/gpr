@@ -1,0 +1,338 @@
+cpu.h:296:    return (env->misa & ext) != 0;
+cpu.h:301:    return env->features & (1ULL << feature);
+cpu.h:354:    *pc = env->pc;
+cpu.h:359:    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
+fpu_helper.c:27:    int soft = get_float_exception_flags(&env->fp_status);
+fpu_helper.c:49:    set_float_exception_flags(soft, &env->fp_status);
+fpu_helper.c:57:        rm = env->frm;
+fpu_helper.c:79:    set_float_rounding_mode(softrm, &env->fp_status);
+fpu_helper.c:85:    return float32_muladd(frs1, frs2, frs3, 0, &env->fp_status);
+fpu_helper.c:91:    return float64_muladd(frs1, frs2, frs3, 0, &env->fp_status);
+fpu_helper.c:98:                          &env->fp_status);
+fpu_helper.c:105:                          &env->fp_status);
+fpu_helper.c:112:                          &env->fp_status);
+fpu_helper.c:119:                          &env->fp_status);
+fpu_helper.c:126:                          float_muladd_negate_product, &env->fp_status);
+fpu_helper.c:133:                          float_muladd_negate_product, &env->fp_status);
+fpu_helper.c:138:    return float32_add(frs1, frs2, &env->fp_status);
+fpu_helper.c:143:    return float32_sub(frs1, frs2, &env->fp_status);
+fpu_helper.c:148:    return float32_mul(frs1, frs2, &env->fp_status);
+fpu_helper.c:153:    return float32_div(frs1, frs2, &env->fp_status);
+fpu_helper.c:158:    return float32_minnum(frs1, frs2, &env->fp_status);
+fpu_helper.c:163:    return float32_maxnum(frs1, frs2, &env->fp_status);
+fpu_helper.c:168:    return float32_sqrt(frs1, &env->fp_status);
+fpu_helper.c:173:    return float32_le(frs1, frs2, &env->fp_status);
+fpu_helper.c:178:    return float32_lt(frs1, frs2, &env->fp_status);
+fpu_helper.c:183:    return float32_eq_quiet(frs1, frs2, &env->fp_status);
+fpu_helper.c:188:    return float32_to_int32(frs1, &env->fp_status);
+fpu_helper.c:193:    return (int32_t)float32_to_uint32(frs1, &env->fp_status);
+fpu_helper.c:199:    return float32_to_int64(frs1, &env->fp_status);
+fpu_helper.c:204:    return float32_to_uint64(frs1, &env->fp_status);
+fpu_helper.c:210:    return int32_to_float32((int32_t)rs1, &env->fp_status);
+fpu_helper.c:215:    return uint32_to_float32((uint32_t)rs1, &env->fp_status);
+fpu_helper.c:221:    return int64_to_float32(rs1, &env->fp_status);
+fpu_helper.c:226:    return uint64_to_float32(rs1, &env->fp_status);
+fpu_helper.c:251:    return float64_add(frs1, frs2, &env->fp_status);
+fpu_helper.c:256:    return float64_sub(frs1, frs2, &env->fp_status);
+fpu_helper.c:261:    return float64_mul(frs1, frs2, &env->fp_status);
+fpu_helper.c:266:    return float64_div(frs1, frs2, &env->fp_status);
+fpu_helper.c:271:    return float64_minnum(frs1, frs2, &env->fp_status);
+fpu_helper.c:276:    return float64_maxnum(frs1, frs2, &env->fp_status);
+fpu_helper.c:281:    return float64_to_float32(rs1, &env->fp_status);
+fpu_helper.c:286:    return float32_to_float64(rs1, &env->fp_status);
+fpu_helper.c:291:    return float64_sqrt(frs1, &env->fp_status);
+fpu_helper.c:296:    return float64_le(frs1, frs2, &env->fp_status);
+fpu_helper.c:301:    return float64_lt(frs1, frs2, &env->fp_status);
+fpu_helper.c:306:    return float64_eq_quiet(frs1, frs2, &env->fp_status);
+fpu_helper.c:311:    return float64_to_int32(frs1, &env->fp_status);
+fpu_helper.c:316:    return (int32_t)float64_to_uint32(frs1, &env->fp_status);
+fpu_helper.c:322:    return float64_to_int64(frs1, &env->fp_status);
+fpu_helper.c:327:    return float64_to_uint64(frs1, &env->fp_status);
+fpu_helper.c:333:    return int32_to_float64((int32_t)rs1, &env->fp_status);
+fpu_helper.c:338:    return uint32_to_float64((uint32_t)rs1, &env->fp_status);
+fpu_helper.c:344:    return int64_to_float64(rs1, &env->fp_status);
+fpu_helper.c:349:    return uint64_to_float64(rs1, &env->fp_status);
+gdbstub.c:279:        return gdb_get_regl(mem_buf, env->gpr[n]);
+gdbstub.c:281:        return gdb_get_regl(mem_buf, env->pc);
+gdbstub.c:295:        env->gpr[n] = ldtul_p(mem_buf);
+gdbstub.c:298:        env->pc = ldtul_p(mem_buf);
+gdbstub.c:307:        return gdb_get_reg64(mem_buf, env->fpr[n]);
+gdbstub.c:328:        env->fpr[n] = ldq_p(mem_buf); /* always 64-bit */
+gdbstub.c:380:    if (env->misa & RVF) {
+gdbstub.c:388:    if (env->misa & RVF) {
+cpu.c:85:    env->misa_mask = env->misa = misa;
+cpu.c:90:    env->user_ver = user_ver;
+cpu.c:91:    env->priv_ver = priv_ver;
+cpu.c:96:    env->features |= (1ULL << feature);
+cpu.c:102:    env->resetvec = resetvec;
+cpu.c:205:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
+cpu.c:207:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+cpu.c:208:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
+cpu.c:210:        (target_ulong)atomic_read(&env->mip));
+cpu.c:211:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+cpu.c:212:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
+cpu.c:213:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
+cpu.c:214:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtvec   ", env->mtvec);
+cpu.c:215:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mepc    ", env->mepc);
+cpu.c:216:    cpu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mcause  ", env->mcause);
+cpu.c:221:            riscv_int_regnames[i], env->gpr[i]);
+cpu.c:229:                riscv_fpr_regnames[i], env->fpr[i]);
+cpu.c:241:    env->pc = value;
+cpu.c:248:    env->pc = tb->pc;
+cpu.c:260:    return (atomic_read(&env->mip) & env->mie) != 0;
+cpu.c:269:    env->pc = data[0];
+cpu.c:280:    env->priv = PRV_M;
+cpu.c:281:    env->mstatus &= ~(MSTATUS_MIE | MSTATUS_MPRV);
+cpu.c:282:    env->mcause = 0;
+cpu.c:283:    env->pc = env->resetvec;
+cpu.c:286:    set_default_nan_mode(1, &env->fp_status);
+op_helper.c:80:    if (!(env->priv >= PRV_S)) {
+op_helper.c:84:    target_ulong retpc = env->sepc;
+op_helper.c:89:    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+op_helper.c:90:        get_field(env->mstatus, MSTATUS_TSR)) {
+op_helper.c:94:    target_ulong mstatus = env->mstatus;
+op_helper.c:97:        env->priv_ver >= PRIV_VERSION_1_10_0 ?
+op_helper.c:103:    env->mstatus = mstatus;
+op_helper.c:110:    if (!(env->priv >= PRV_M)) {
+op_helper.c:114:    target_ulong retpc = env->mepc;
+op_helper.c:119:    target_ulong mstatus = env->mstatus;
+op_helper.c:122:        env->priv_ver >= PRIV_VERSION_1_10_0 ?
+op_helper.c:128:    env->mstatus = mstatus;
+op_helper.c:137:    if (env->priv == PRV_S &&
+op_helper.c:138:        env->priv_ver >= PRIV_VERSION_1_10_0 &&
+op_helper.c:139:        get_field(env->mstatus, MSTATUS_TW)) {
+op_helper.c:152:    if (env->priv == PRV_S &&
+op_helper.c:153:        env->priv_ver >= PRIV_VERSION_1_10_0 &&
+op_helper.c:154:        get_field(env->mstatus, MSTATUS_TVM)) {
+op_helper.c:266:    HpuVR *r = &env->vregs[vrn];
+op_helper.c:278:    HpuVPR *r = &env->vpregs[vprn];
+op_helper.c:399:        return &env->vpregs[vpr_i].flags[0][0];
+op_helper.c:424:    p = (uint64_t *)&env->mmab.mblks[mm_addr];
+op_helper.c:429:    tool_dump_mm(&env->mmab, mm_addr, len / HPU_MM_BLOCK_LENGTH, 0);
+op_helper.c:446:                buf1 = (uint8_t*)&env->mmab.mblks[mm_addr];
+op_helper.c:452:                buf1 = (uint8_t*)&env->mmab.mblks[mm_addr];
+op_helper.c:453:                buf2 = (uint8_t*)&env->mmab.mblks[mm_addr + 1];
+op_helper.c:459:                buf1 = (uint8_t*)&env->mmab.mblks[mm_addr];
+op_helper.c:460:                buf2 = (uint8_t*)&env->mmab.mblks[mm_addr + 1];
+op_helper.c:461:                buf3 = (uint8_t*)&env->mmab.mblks[mm_addr + 2];
+op_helper.c:462:                buf4 = (uint8_t*)&env->mmab.mblks[mm_addr + 3];
+op_helper.c:471:                env->vregs[vrd].words[i][j] = (int8_t)(buf1[index]);
+op_helper.c:474:                env->vregs[vrd].words[i][j] = uint8x2toint(buf1[index], buf2[index]);
+op_helper.c:478:                env->vregs[vrd].words[i][j] = uint8x4toint(buf1[index], buf2[index], buf3[index], buf4[index]);
+op_helper.c:494:                env->mmab.mblks[mm_addr + k].bytes[i][j] = (uint8_t)((env->vregs[vrs].words[i][j] >> (k*8)) & 0x000000ff);
+op_helper.c:498:    tool_dump_mm(&env->mmab, mm_addr, 4, 0);
+op_helper.c:507:    pd  = (int *)&env->vregs[vrd].words[0][0];
+op_helper.c:508:    psa = (int *)&env->vregs[vrsa].words[0][0];
+op_helper.c:509:    psb = (int *)&env->vregs[vrsb].words[0][0];
+op_helper.c:524:    pd  = (int *)&env->vregs[vrd].words[0][0];
+op_helper.c:525:    psa = (int *)&env->vregs[vrsa].words[0][0];
+op_helper.c:545:                tmp_vr.words[i][j] = env->vregs[vrd].words[i][pos_col];
+op_helper.c:547:                tmp_vr.words[i][j] = env->vregs[vrd].words[i][j];
+op_helper.c:550:    memcpy(&env->vregs[vrd].words[0][0], &tmp_vr.words[0][0], sizeof(tmp_vr));
+op_helper.c:565:                tmp_vr.words[i][j] = env->vregs[vrd].words[pos_lin][j];
+op_helper.c:567:                tmp_vr.words[i][j] = env->vregs[vrd].words[i][j];
+op_helper.c:570:    memcpy(&env->vregs[vrd].words[0][0], &tmp_vr.words[0][0], sizeof(tmp_vr));
+op_helper.c:578:    vr1 = &env->vregs[vrs1].words[0][0];
+op_helper.c:579:    vr2 = &env->vregs[vrs2].words[0][0];
+op_helper.c:580:    vpd = &env->vpregs[vprd].flags[0][0];
+op_helper.c:592:    vr1 = &env->vregs[vrs1].words[0][0];
+op_helper.c:593:    vpd = &env->vpregs[vprd].flags[0][0];
+op_helper.c:604:    vp1 = &env->vpregs[vrs1].flags[0][0];
+op_helper.c:605:    vp2 = &env->vpregs[vrs2].flags[0][0];
+op_helper.c:606:    vpd = &env->vpregs[vprd].flags[0][0];
+op_helper.c:617:    vp1 = &env->vpregs[vpr1];
+op_helper.c:618:    vp2 = &env->vpregs[vpr2];
+op_helper.c:651:    tool_dump_mm(&env->mmab, addr_a, 1, 1);
+op_helper.c:652:    tool_dump_mm(&env->mmab, addr_b, 1, 1);
+op_helper.c:655:        m1 = (int8_t  *)&env->mmab.mblks[addr_a + ofa].bytes[0][0];
+op_helper.c:656:        m2 = (int8_t  *)&env->mmab.mblks[addr_b + ofb].bytes[0][0];
+op_helper.c:661:    mv = (int32_t *)&env->vregs[vrs].words[0][0];
+op_helper.c:662:    pd = (int32_t *)&env->vregs[vrd].words[0][0];
+op_helper.c:699:    tool_dump_mm(&env->mmab, addr_a, 1, 1);
+op_helper.c:700:    tool_dump_mm(&env->mmab, addr_b, 1, 1);
+op_helper.c:703:        m1 = (int8_t  *)&env->mmab.mblks[addr_a + ofa].bytes[0][0];
+op_helper.c:704:        m2 = (int8_t  *)&env->mmab.mblks[addr_b + ofb].bytes[0][0];
+op_helper.c:711:    mv = (int32_t *)&env->vregs[vrs].words[0][0];
+op_helper.c:712:    pd = (int32_t *)&env->vregs[vrd].words[0][0];
+op_helper.c:734:    printf("\n check-pc=%x t0=%x\n\n", env->pc, env->gpr[5]);
+pmp.c:62:    if (env->pmp_state.pmp[pmp_index].cfg_reg & PMP_LOCK) {
+pmp.c:75:        pmp_get_a_field(env->pmp_state.pmp[pmp_index + 1].cfg_reg);
+pmp.c:76:    if ((env->pmp_state.pmp[pmp_index + 1u].cfg_reg & PMP_LOCK) &&
+pmp.c:89:     return env->pmp_state.num_rules;
+pmp.c:98:        return env->pmp_state.pmp[pmp_index].cfg_reg;
+pmp.c:113:            env->pmp_state.pmp[pmp_index].cfg_reg = val;
+pmp.c:159:    env->pmp_state.num_rules = 0;
+pmp.c:161:    uint8_t this_cfg = env->pmp_state.pmp[pmp_index].cfg_reg;
+pmp.c:162:    target_ulong this_addr = env->pmp_state.pmp[pmp_index].addr_reg;
+pmp.c:168:        prev_addr = env->pmp_state.pmp[pmp_index - 1].addr_reg;
+pmp.c:197:    env->pmp_state.addr[pmp_index].sa = sa;
+pmp.c:198:    env->pmp_state.addr[pmp_index].ea = ea;
+pmp.c:202:            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+pmp.c:204:            env->pmp_state.num_rules++;
+pmp.c:213:    if ((addr >= env->pmp_state.addr[pmp_index].sa)
+pmp.c:214:        && (addr <= env->pmp_state.addr[pmp_index].ea)) {
+pmp.c:261:            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+pmp.c:268:            if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
+pmp.c:269:                allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
+pmp.c:284:        if (env->priv == PRV_M) {
+pmp.c:308:        env->mhartid, reg_index, val);
+pmp.c:339:        env->mhartid, reg_index, cfg_val);
+pmp.c:352:        env->mhartid, addr_index, val);
+pmp.c:356:            env->pmp_state.pmp[addr_index].addr_reg = val;
+pmp.c:375:        env->mhartid, addr_index,
+pmp.c:376:        env->pmp_state.pmp[addr_index].addr_reg);
+pmp.c:378:        return env->pmp_state.pmp[addr_index].addr_reg;
+translate.c:54:       which we have already installed into env->fp_status.  Or -1 for
+translate.c:861:        // printf("--decode env pc=%x\n\n", env->pc);
+translate.c:883:    ctx->priv_ver = env->priv_ver;
+translate.c:884:    ctx->misa = env->misa;
+cpu_helper.c:32:    return env->priv;
+cpu_helper.c:39:    target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
+cpu_helper.c:40:    target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
+cpu_helper.c:41:    target_ulong pending = atomic_read(&env->mip) & env->mie;
+cpu_helper.c:42:    target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
+cpu_helper.c:43:    target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
+cpu_helper.c:44:    target_ulong irqs = (pending & ~env->mideleg & -mie) |
+cpu_helper.c:45:                        (pending &  env->mideleg & -sie);
+cpu_helper.c:77:    if (env->miclaim & interrupts) {
+cpu_helper.c:80:        env->miclaim |= interrupts;
+cpu_helper.c:89:    uint32_t old, new, cmp = atomic_read(&env->mip);
+cpu_helper.c:94:        cmp = atomic_cmpxchg(&env->mip, old, new);
+cpu_helper.c:115:    env->priv = newpriv;
+cpu_helper.c:130:    /* NOTE: the env->pc value visible here will not be
+cpu_helper.c:137:        if (get_field(env->mstatus, MSTATUS_MPRV)) {
+cpu_helper.c:138:            mode = get_field(env->mstatus, MSTATUS_MPP);
+cpu_helper.c:152:    int mxr = get_field(env->mstatus, MSTATUS_MXR);
+cpu_helper.c:154:    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+cpu_helper.c:155:        base = get_field(env->satp, SATP_PPN) << PGSHIFT;
+cpu_helper.c:156:        sum = get_field(env->mstatus, MSTATUS_SUM);
+cpu_helper.c:157:        vm = get_field(env->satp, SATP_MODE);
+cpu_helper.c:175:        base = env->sptbr << PGSHIFT;
+cpu_helper.c:176:        sum = !get_field(env->mstatus, MSTATUS_PUM);
+cpu_helper.c:177:        vm = get_field(env->mstatus, MSTATUS_VM);
+cpu_helper.c:325:        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
+cpu_helper.c:326:        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
+cpu_helper.c:343:    env->badaddr = address;
+cpu_helper.c:378:    env->badaddr = addr;
+cpu_helper.c:410:             %d\n", __func__, env->pc, address, rw, mmu_idx);
+cpu_helper.c:461:    target_ulong deleg = async ? env->mideleg : env->medeleg;
+cpu_helper.c:483:            tval = env->badaddr;
+cpu_helper.c:490:            assert(env->priv <= 3);
+cpu_helper.c:491:            cause = ecall_cause_map[env->priv];
+cpu_helper.c:495:    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval, cause < 16 ?
+cpu_helper.c:498:    if (env->priv <= PRV_S &&
+cpu_helper.c:501:        target_ulong s = env->mstatus;
+cpu_helper.c:502:        s = set_field(s, MSTATUS_SPIE, env->priv_ver >= PRIV_VERSION_1_10_0 ?
+cpu_helper.c:503:            get_field(s, MSTATUS_SIE) : get_field(s, MSTATUS_UIE << env->priv));
+cpu_helper.c:504:        s = set_field(s, MSTATUS_SPP, env->priv);
+cpu_helper.c:506:        env->mstatus = s;
+cpu_helper.c:507:        env->scause = cause | ~(((target_ulong)-1) >> async);
+cpu_helper.c:508:        env->sepc = env->pc;
+cpu_helper.c:509:        env->sbadaddr = tval;
+cpu_helper.c:510:        env->pc = (env->stvec >> 2 << 2) +
+cpu_helper.c:511:            ((async && (env->stvec & 3) == 1) ? cause * 4 : 0);
+cpu_helper.c:515:        target_ulong s = env->mstatus;
+cpu_helper.c:516:        s = set_field(s, MSTATUS_MPIE, env->priv_ver >= PRIV_VERSION_1_10_0 ?
+cpu_helper.c:517:            get_field(s, MSTATUS_MIE) : get_field(s, MSTATUS_UIE << env->priv));
+cpu_helper.c:518:        s = set_field(s, MSTATUS_MPP, env->priv);
+cpu_helper.c:520:        env->mstatus = s;
+cpu_helper.c:521:        env->mcause = cause | ~(((target_ulong)-1) >> async);
+cpu_helper.c:522:        env->mepc = env->pc;
+cpu_helper.c:523:        env->mbadaddr = tval;
+cpu_helper.c:524:        env->pc = (env->mtvec >> 2 << 2) +
+cpu_helper.c:525:            ((async && (env->mtvec & 3) == 1) ? cause * 4 : 0);
+csr.c:49:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:61:    if (env->priv < PRV_M) {
+csr.c:62:        ctr_en &= env->mcounteren;
+csr.c:64:    if (env->priv < PRV_S) {
+csr.c:65:        ctr_en &= env->scounteren;
+csr.c:95:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:106:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:109:    env->mstatus |= MSTATUS_FS;
+csr.c:118:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:122:    *val = env->frm;
+csr.c:129:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:132:    env->mstatus |= MSTATUS_FS;
+csr.c:134:    env->frm = val & (FSR_RD >> FSR_RD_SHIFT);
+csr.c:141:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:146:        | (env->frm << FSR_RD_SHIFT);
+csr.c:153:    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+csr.c:156:    env->mstatus |= MSTATUS_FS;
+csr.c:158:    env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
+csr.c:272:    *val = env->mhartid;
+csr.c:279:    *val = env->mstatus;
+csr.c:285:    return (env->priv_ver >= PRIV_VERSION_1_10_0) ?
+csr.c:291:    target_ulong mstatus = env->mstatus;
+csr.c:296:    if (env->priv_ver <= PRIV_VERSION_1_09_1) {
+csr.c:307:    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+csr.c:330:    env->mstatus = mstatus;
+csr.c:337:    *val = env->misa;
+csr.c:363:    val &= env->misa_mask;
+csr.c:381:    val = (env->misa & MISA_MXL) | (val & ~MISA_MXL);
+csr.c:384:    if (val != env->misa) {
+csr.c:388:    env->misa = val;
+csr.c:395:    *val = env->medeleg;
+csr.c:401:    env->medeleg = (env->medeleg & ~delegable_excps) | (val & delegable_excps);
+csr.c:407:    *val = env->mideleg;
+csr.c:413:    env->mideleg = (env->mideleg & ~delegable_ints) | (val & delegable_ints);
+csr.c:419:    *val = env->mie;
+csr.c:425:    env->mie = (env->mie & ~all_ints) | (val & all_ints);
+csr.c:431:    *val = env->mtvec;
+csr.c:439:        env->mtvec = val;
+csr.c:448:    if (env->priv_ver < PRIV_VERSION_1_10_0) {
+csr.c:451:    *val = env->mcounteren;
+csr.c:457:    if (env->priv_ver < PRIV_VERSION_1_10_0) {
+csr.c:460:    env->mcounteren = val;
+csr.c:466:    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+csr.c:469:    *val = env->mcounteren;
+csr.c:475:    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+csr.c:478:    env->mcounteren = val;
+csr.c:484:    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+csr.c:487:    *val = env->scounteren;
+csr.c:493:    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+csr.c:496:    env->scounteren = val;
+csr.c:503:    *val = env->mscratch;
+csr.c:509:    env->mscratch = val;
+csr.c:515:    *val = env->mepc;
+csr.c:521:    env->mepc = val;
+csr.c:527:    *val = env->mcause;
+csr.c:533:    env->mcause = val;
+csr.c:539:    *val = env->mbadaddr;
+csr.c:545:    env->mbadaddr = val;
+csr.c:554:    target_ulong mask = write_mask & delegable_ints & ~env->miclaim;
+csr.c:562:        old_mip = atomic_read(&env->mip);
+csr.c:575:    target_ulong mask = ((env->priv_ver >= PRIV_VERSION_1_10_0) ?
+csr.c:577:    *val = env->mstatus & mask;
+csr.c:583:    target_ulong mask = ((env->priv_ver >= PRIV_VERSION_1_10_0) ?
+csr.c:585:    target_ulong newval = (env->mstatus & ~mask) | (val & mask);
+csr.c:591:    *val = env->mie & env->mideleg;
+csr.c:597:    target_ulong newval = (env->mie & ~env->mideleg) | (val & env->mideleg);
+csr.c:603:    *val = env->stvec;
+csr.c:611:        env->stvec = val;
+csr.c:620:    if (env->priv_ver < PRIV_VERSION_1_10_0) {
+csr.c:623:    *val = env->scounteren;
+csr.c:629:    if (env->priv_ver < PRIV_VERSION_1_10_0) {
+csr.c:632:    env->scounteren = val;
+csr.c:639:    *val = env->sscratch;
+csr.c:645:    env->sscratch = val;
+csr.c:651:    *val = env->sepc;
+csr.c:657:    env->sepc = val;
+csr.c:663:    *val = env->scause;
+csr.c:669:    env->scause = val;
+csr.c:675:    *val = env->sbadaddr;
+csr.c:681:    env->sbadaddr = val;
+csr.c:689:                   write_mask & env->mideleg);
+csr.c:697:    } else if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+csr.c:698:        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+csr.c:701:            *val = env->satp;
+csr.c:704:        *val = env->sptbr;
+csr.c:714:    if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val ^ env->sptbr)) {
+csr.c:716:        env->sptbr = val & (((target_ulong)
+csr.c:719:    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+csr.c:721:        ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
+csr.c:723:        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+csr.c:727:            env->satp = val;
+csr.c:779:    if ((write_mask && read_only) || (env->priv < csr_priv)) {
+csr.c:825: * Debugger support.  If not in user mode, set env->debugger before the
+csr.c:833:    env->debugger = true;
+csr.c:837:    env->debugger = false;
