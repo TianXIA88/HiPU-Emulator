@@ -1,0 +1,120 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: AlonzoChen
+ * @Date: 2020-12-29 14:35:14
+ * @LastEditors: AlonzoChen
+ * @LastEditTime: 2021-03-29 15:56:08
+ */
+// #include "hikl_param.h"
+#include "hihw.h"
+#include "dma.h"
+
+volatile unsigned int test_flag = 0;
+volatile unsigned int test_flag1 = 0;
+static unsigned int *_amo_flags = (unsigned int *)AMO_ADDR_S;
+static unsigned int ndma_times_from_local_mem_to_ddr = 0;       //write times: amo[7],  write size: amo[8]
+static unsigned int ndma_times_from_ddr_to_local_mem = 0;       //read times: amo[9], read size: amd[10]
+static unsigned int ndma_poll_times = 0;       //read: amo[11]
+
+void __ndma_poll(){
+    // uint32 x = 0;
+    // ndma_clr_signal_done(x);
+    uint32 poll = 0;
+    _amo_flags[12] = 0;
+    _amo_flags[13] = 0;
+    _amo_flags[1] = 0;
+    _amo_flags[11] = ++ndma_poll_times;
+    ndma_over_poll(poll);
+}
+
+void __rd_from_remote_var_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr){
+    __ndma_poll();
+    // _amo_flags[9] = ++ndma_times_from_ddr_to_local_mem;
+    // _amo_flags[10] = 4;
+
+    ndma_cfg(ndma_xy(rm_x, rm_y), rm_addr, var, 4);
+    ndma_start(DMA_RX_CMD);
+}
+
+void __wr_to_remote_var_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr){
+    __ndma_poll();
+    // _amo_flags[7] = ++ndma_times_from_local_mem_to_ddr;
+    // _amo_flags[8] = 4;
+
+    ndma_cfg(ndma_xy(rm_x, rm_y), rm_addr, var, 4);
+    ndma_start(DMA_TX_CMD);
+}
+
+uint32 __rd_from_remote_chunk_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size){
+    __ndma_poll();
+    if(size & 0x3f) // must align with 64 Byte
+        return -1;
+    else{
+        // printf("Size=%x LCAddr=%x RMAddr=%x\n\r", size, var, rm_addr);
+        // __ndma_poll();
+        // _amo_flags[9] = ++ndma_times_from_ddr_to_local_mem;
+        // _amo_flags[10] = size;
+
+        ndma_cfg(ndma_xy(rm_x, rm_y), rm_addr, var, size);
+        ndma_start(DMA_RX_CMD);
+        return 0;
+    }
+}
+
+uint32 __wr_to_remote_chunk_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size){
+    __ndma_poll();
+    if(size & 0x3f)
+        return -1;
+    else{
+        // __ndma_poll();
+        // _amo_flags[7] = ++ndma_times_from_local_mem_to_ddr;
+        // _amo_flags[8] = size;
+
+        ndma_cfg(ndma_xy(rm_x, rm_y), rm_addr, var, size);
+        ndma_start(DMA_TX_CMD);
+        return 0;
+    }
+}
+
+void __rd_from_remote_var_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr){
+    __ndma_poll();
+    __rd_from_remote_var_non_blocking(var, rm_x, rm_y, rm_addr);
+    __ndma_poll();
+}
+
+void __wr_to_remote_var_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr){
+    __ndma_poll();
+    __wr_to_remote_var_non_blocking(var, rm_x, rm_y, rm_addr);
+    __ndma_poll();
+}
+
+uint32 __rd_from_remote_chunk_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size){
+    __ndma_poll();
+
+    _amo_flags[9] = ++ndma_times_from_ddr_to_local_mem;
+    _amo_flags[10] = size;
+
+    if(__rd_from_remote_chunk_non_blocking(var, rm_x, rm_y, rm_addr, size))
+        return -1;
+    __ndma_poll();
+    return 0;
+}
+
+uint32 __wr_to_remote_chunk_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size){
+    __ndma_poll();
+
+    _amo_flags[7] = ++ndma_times_from_local_mem_to_ddr;
+    _amo_flags[8] = size;
+    if(__wr_to_remote_chunk_non_blocking(var, rm_x, rm_y, rm_addr, size))
+        return -1;
+    __ndma_poll();
+    return 0;
+}
+
+void __swp_rmt_lock_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 lock_addr){
+    __ndma_poll();
+    ndma_cfg(ndma_xy(rm_x, rm_y), lock_addr, var, 4);
+    ndma_start(DMA_SWAP);
+    __ndma_poll();
+}

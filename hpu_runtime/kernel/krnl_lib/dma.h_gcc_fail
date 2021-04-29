@@ -1,0 +1,175 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: AlonzoChen
+ * @Date: 2020-12-29 14:35:14
+ * @LastEditors: AlonzoChen
+ * @LastEditTime: 2021-03-23 11:08:46
+ */
+#ifndef LIBDMA_H
+#define LIBDMA_H
+
+#include "hisdk_type.h"
+#include "hihw.h"
+
+extern volatile unsigned int test_flag;
+extern volatile unsigned int test_flag1;
+#define DMA_TX_CMD              0
+#define DMA_RX_CMD              1
+#define DMA_SWAP                2
+#define DMA_STATUS_MASK         (0xff000000)
+
+                                // }while(((x) & DMA_STATUS_MASK) == 0);   \
+                                // }while(test_flag1 == 1234);   \
+// 00: tx; 01: rx; 10:swap; 11:clear
+#define ndma_xy(x, y)           (((x)&0x3)<<2)+((y)&0x3)
+#define ndma_start(x)           csrw(CSR_ADDR_NDMA_CTRL, x)
+#define ndma_over_poll(x)       do{                                     \
+                                    csrr(x, CSR_ADDR_NDMA_STATUS);      \
+                                    ((unsigned int *)AMO_ADDR_S)[12] = x; \
+                                    ((unsigned int *)AMO_ADDR_S)[13] = (x) & DMA_STATUS_MASK; \
+                                }while(((x) & DMA_STATUS_MASK) == 0);   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc0; \
+                                test_flag = 0xa; \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabb0; \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabb1; \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabb2; \
+                                test_flag1 = 1234;                  \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc1; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc2; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc3; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc4; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc5; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc6; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc7; \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                test_flag ++;   \
+                                ((unsigned int *)AMO_ADDR_S)[1] = 0xabc8; \
+                                x = 0xffffffff;                         \
+                                csrw(CSR_ADDR_NDMA_CTRL, x)
+
+#define ndma_clr_signal_done(x) x = 0xff000003;                         \
+                                csrw(CSR_ADDR_NDMA_CTRL, x)
+
+#define ndma_cfg(xy, r, l, s)   csrw(CSR_ADDR_NDMA_RTADDR, (r));    \
+                                csrw(CSR_ADDR_NDMA_DESTXY, (xy));   \
+                                csrw(CSR_ADDR_NDMA_LCADDR, (l));    \
+                                csrw(CSR_ADDR_NDMA_SIZE, (s));  
+
+void __ndma_poll();
+void __rd_from_remote_var_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr);
+void __wr_to_remote_var_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr);
+uint32 __rd_from_remote_chunk_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size);
+uint32 __wr_to_remote_chunk_non_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size);
+void __rd_from_remote_var_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr);
+void __wr_to_remote_var_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr);
+uint32 __rd_from_remote_chunk_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size);
+uint32 __wr_to_remote_chunk_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 rm_addr, uint32 size);
+void __swp_rmt_lock_blocking(uint32 *var, uint32 rm_x, uint32 rm_y, uint32 lock_addr);
+
+
+#endif /*LIBDMA_H*/
