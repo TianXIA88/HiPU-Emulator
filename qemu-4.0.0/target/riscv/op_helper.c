@@ -822,93 +822,62 @@ void helper_hipu_vfi(CPURISCVState *env, uint32_t vpr, uint32_t vrsa, uint32_t i
     // DUMP_VR(env, vrd);
 }
 
-/* misc = | sh | ce | op | vpr | */
-void helper_hipu_matrix_op(CPURISCVState *env, uint32_t vrd, uint32_t addr_a, uint32_t addr_b,  uint32_t vrs, uint32_t misc){
-    uint32_t vpr = misc & 0xFF;
-    uint32_t op  = (misc >> 8 ) & 0xFF;
-    uint32_t ce  = (misc >> 16) & 0xFF;
+void matrix_op(CPURISCVState *env, uint32_t vrd, uint32_t addr_a, uint32_t addr_b,  uint32_t vrs, 
+            uint32_t vpr, uint32_t op, uint32_t ce,  int32_t mtx_num, int32_t mtx_size, int32_t mtx_stride, 
+            int32_t mtx_region_start, int32_t mtx_region_end, int32_t mtx_cluster_start, int32_t mtx_cluster_end, 
+            int32_t mtx_cluster_num, int32_t mtx_cluster_stride, int32_t wt_blk_stride, int32_t wt_cluster_stride){
     bool *vpr_r;
-    vpr_r = get_vpr(env, vpr);
-    // DBG_PRINT("\n=========\nOP=%d: MM[0x%x] x MM[0x%x] + VR[%d] => VR[%d] misc=0x%x\n", op, addr_a, addr_b, vrs, vrd, misc);
     int8_t *m1, *m2, *ms;
     int32_t *md, *mv, *pd;
-    int32_t mac_size, mac_stride, mac_region_end, mac_region_start, mtx_cluster_start, mtx_cluster_end, mtx_cluster_num, mtx_cluster_stride;
-    int32_t wt_blk_stride, wt_cluster_stride;
-    HpuVR tmp_vr = {{{0}}};
-    HpuMMBlock tmp_ms;
     int size = mop_size[op];
     int step = size * size / HPU_MM_BLOCK_LENGTH;
-    int32_t ans;
+    int32_t ans, iter;
+    int ofa, ofb = 0;
+    int start_to_end = mtx_cluster_end - mtx_cluster_start;
+
+    vpr_r = get_vpr(env, vpr);
+
+    HpuVR tmp_vr = {{{0}}};
+    HpuMMBlock tmp_ms;
     md = (int32_t *)&tmp_vr.words[0][0];
     ms = (int8_t  *)&tmp_ms.bytes[0][0];
 
-    int mac_num, ofa, ofb=0;
-    mtx_cluster_start = riscv_csr_read(env, 0xBD0);
-    mtx_cluster_end = riscv_csr_read(env, 0xBD1);
-    mtx_cluster_stride = riscv_csr_read(env, 0xBD8);
-    wt_cluster_stride = riscv_csr_read(env, 0xBDA);
-    // printf("cls_start = %x, cls_end = %x, cls_stride = %x \n", mtx_cluster_start,  mtx_cluster_end, mtx_cluster_stride);
-    if(ce)
-        mac_num = riscv_csr_read(env, 0xBD5);
-    else
-        mac_num = 0;
-    
-    mtx_cluster_num = riscv_csr_read(env, 0xBD6);
-    if(ce)
-        mac_size = riscv_csr_read(env, 0xBD4);
-
-    else
-        mac_size = 0;
-    mac_stride = riscv_csr_read(env, 0xBD7);
-    wt_blk_stride = riscv_csr_read(env, 0xBD9);
-    mac_region_end = riscv_csr_read(env, 0xBD3);
-    mac_region_start = riscv_csr_read(env, 0xBD2);
-    
-    // printf("mac_num = %x, mac_size = %x, mac_stride = %x, mac_region_start = %x, mac_region_end = %x, cls_num = %x\n", mac_num, mac_size, mac_stride, mac_region_start, mac_region_end, mtx_cluster_num);
-    int start_to_end = mtx_cluster_end - mtx_cluster_start;
-    int iter;
-
     for(int cls_iter=0; cls_iter < mtx_cluster_num + 1; cls_iter++){
-        if(addr_a + 1> mac_region_end){
-            addr_a = (addr_a - mac_region_end) % (mac_region_end - mac_region_start) + mac_region_start;
+        if(addr_a + 1> mtx_region_end){
+            addr_a = (addr_a - mtx_region_end) % (mtx_region_end - mtx_region_start) + mtx_region_start;
         }
-        if(mtx_cluster_start + 1> mac_region_end){
-            mtx_cluster_start = (mtx_cluster_start - mac_region_end) % (mac_region_end - mac_region_start) + mac_region_start;
-            mtx_cluster_end = (mtx_cluster_end - mac_region_end) % (mac_region_end - mac_region_start) + mac_region_start;
+        if(mtx_cluster_start + 1> mtx_region_end){
+            mtx_cluster_start = (mtx_cluster_start - mtx_region_end) % (mtx_region_end - mtx_region_start) + mtx_region_start;
+            mtx_cluster_end = (mtx_cluster_end - mtx_region_end) % (mtx_region_end - mtx_region_start) + mtx_region_start;
         }
-        for(int num_iter=0; num_iter < mac_num + 1; num_iter++){
-            for(int size_iter=0; size_iter < mac_size + 1; size_iter++){
-                iter = num_iter * (mac_size + 1)+ size_iter;
+        for(int num_iter=0; num_iter < mtx_num + 1; num_iter++){
+            for(int size_iter=0; size_iter < mtx_size + 1; size_iter++){
+                iter = num_iter * (mtx_size + 1) + size_iter;
                 if(ce){
-                    ofa = ACC_ITERATE_OFFSET(iter, (mac_size + 1), mac_stride);
-                    ofb = ACC_ITERATE_OFFSET(iter, (mac_size + 1)*step, wt_blk_stride);
-                    // ofa += cls_iter * mtx_cluster_stride;
-                    // ofb += cls_iter * wt_cluster_stride;
+                    ofa = ACC_ITERATE_OFFSET(iter, (mtx_size + 1), mtx_stride);
+                    ofb = ACC_ITERATE_OFFSET(iter, (mtx_size + 1)*step, wt_blk_stride);
                 }
                 else{
-                    ofa = ACC_ITERATE_OFFSET(num_iter * (mac_size + 1) + size_iter, 1, 2);
-                    ofb = ACC_ITERATE_OFFSET(num_iter * (mac_size + 1) + size_iter, 1, 2);
+                    ofa = ACC_ITERATE_OFFSET(num_iter * (mtx_size + 1) + size_iter, 1, 2);
+                    ofb = ACC_ITERATE_OFFSET(num_iter * (mtx_size + 1) + size_iter, 1, 2);
                 }
 
                 ans = addr_a + ofa;
 
-                m2 = (int8_t  *)&env->mmab.mblks[addr_b + ofb].bytes[0][0];
+                m2 = (int8_t *)&env->mmab.mblks[addr_b + ofb].bytes[0][0];
 
                 if(ans < mtx_cluster_start){
-                    m1 = (int8_t  *)&env->mmab.mblks[(ans + start_to_end)].bytes[0][0];
+                    m1 = (int8_t *)&env->mmab.mblks[(ans + start_to_end)].bytes[0][0];
                     int8_matrix_shift(ms, m1, SHDOWN);
- 
                 }
                 else if(ans + 1> mtx_cluster_end){
-                    m1 = (int8_t  *)&env->mmab.mblks[(ans - start_to_end)].bytes[0][0];
+                    m1 = (int8_t *)&env->mmab.mblks[(ans - start_to_end)].bytes[0][0];
                     int8_matrix_shift(ms, m1, SHUP);
                 }
                 else{
-                   ms = (int8_t  *)&env->mmab.mblks[ans].bytes[0][0];
- 
+                   ms = (int8_t *)&env->mmab.mblks[ans].bytes[0][0];
                 }                
                 (*mops[op])(md, ms, m2, size);
-                ms = (int8_t  *)&tmp_ms.bytes[0][0];
             }
         }
         addr_a +=  mtx_cluster_stride;
@@ -921,13 +890,45 @@ void helper_hipu_matrix_op(CPURISCVState *env, uint32_t vrd, uint32_t addr_a, ui
     for(int k=0; k < HPU_MX_LENGTH; k++){
         if(vpr_r[k]){
             pd[k] = md[k] + mv[k];
-            // DBG_PRINT("%d: %d = %d + %d\n", k, pd[k], md[k], mv[k]);
         }
         else
             continue;
     }
     // DUMP_VR(env, vrd);
     // DUMP_MM(&env->mmab, 0x0, 4, 0);
+}
+
+/* misc = | sh | ce | op | vpr | */
+void helper_hipu_matrix_op(CPURISCVState *env, uint32_t vrd, uint32_t addr_a, uint32_t addr_b,  uint32_t vrs, uint32_t misc){
+    uint32_t vpr = misc & 0xFF;
+    uint32_t op  = (misc >> 8 ) & 0xFF;
+    uint32_t ce  = (misc >> 16) & 0xFF;
+    int32_t mtx_num, mtx_size, mtx_stride, mtx_region_end, mtx_region_start;
+    int32_t mtx_cluster_start, mtx_cluster_end, mtx_cluster_num, mtx_cluster_stride;
+    int32_t wt_blk_stride, wt_cluster_stride;
+
+    mtx_cluster_start = riscv_csr_read(env, 0xBD0);
+    mtx_cluster_end = riscv_csr_read(env, 0xBD1);
+    mtx_region_start = riscv_csr_read(env, 0xBD2);
+    mtx_region_end = riscv_csr_read(env, 0xBD3);
+    mtx_cluster_num = riscv_csr_read(env, 0xBD6);
+    mtx_stride = riscv_csr_read(env, 0xBD7);
+    mtx_cluster_stride = riscv_csr_read(env, 0xBD8);
+    wt_blk_stride = riscv_csr_read(env, 0xBD9);
+    wt_cluster_stride = riscv_csr_read(env, 0xBDA);
+    
+    if(ce){
+        mtx_size = riscv_csr_read(env, 0xBD4);
+        mtx_num = riscv_csr_read(env, 0xBD5);
+    }
+    else{
+        mtx_size = 0;
+        mtx_num = 0;
+    }
+
+    matrix_op(env, vrd, addr_a, addr_b, vrs, vpr, op, ce,  mtx_num, mtx_size, mtx_stride, 
+                mtx_region_start, mtx_region_end, mtx_cluster_start, mtx_cluster_end, 
+                mtx_cluster_num, mtx_cluster_stride, wt_blk_stride, wt_cluster_stride);
 }
 
 /* misc = | sh | ce | op | vpr | */
